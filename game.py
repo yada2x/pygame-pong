@@ -2,18 +2,17 @@ import pygame
 import sys
 
 from scripts.utils import load_image
+from scripts.entities import PhysicsEntity
 
 class Game:
     def __init__(self):
         pygame.init()
         pygame.display.set_caption("PyPong")
 
-        self.screen = pygame.display.set_mode((802, 456))
+        self.screen = pygame.display.set_mode((800, 450))
         # self.display = pygame.Surface((401, 228))
 
         self.clock = pygame.time.Clock()
-
-        self.movement = [False, False] # [Up, Down]
 
         self.assets = {
             'ball': load_image('Ball.png'),
@@ -24,11 +23,19 @@ class Game:
             'scorebar': load_image('ScoreBar.png')
         }
 
+        self.player = PhysicsEntity(self, 'player', (750, 175), (17, 120))
+        self.computer = PhysicsEntity(self, 'computer', (50, 175), (17, 120))
+        self.movement = [False, False] # [Up, Down]
+
     def run(self):
-        
-        while True:    
+        while True:
+            # self.screen.fill((0, 0, 0)) # Clear everything
             self.screen.blit(self.assets['board'], (0, 0)) # Blits background
 
+            self.player.update(self.movement[1] - self.movement[0], 5)
+            self.player.render(self.screen)
+
+            self.computer.render(self.screen)
 
             # Input Checker
             for event in pygame.event.get():
