@@ -26,11 +26,33 @@ class PhysicsEntity:
         surface.blit(self.game.assets[self.type], self.pos)
 
 class Ball(PhysicsEntity):
-    def __init__(self, game, type, pos, size):
+    def __init__(self, game, type, pos, size, x_dir, y_dir, speed, players: list[PhysicsEntity]):
         super().__init__(game, type, pos, size)
-    
-    def rect(self):
-        super().__init__(self)
+        self.x_dir = x_dir
+        self.y_dir = y_dir
+        self.speed = speed
+        self.players = players
 
-    def update(self, movement=(0,0), speed=0):
-        pass
+    def update(self):
+        self.pos[0] += self.speed * self.x_dir
+        self.pos[1] += self.speed * self.y_dir
+
+        ball_rect = self.rect()
+        if ball_rect.bottom > self.screen_height:
+            self.pos[1] = self.screen_height - self.size[1]
+            self.y_dir *= -1
+        if ball_rect.top <= 47:
+            self.pos[1] = 47
+            self.y_dir *= -1
+
+        if ball_rect.left < 0:
+            self.pos[0] = 0
+            self.x_dir *= -1
+        if ball_rect.right >= 800:
+            self.pos[0] = 800 - self.size[0]
+            self.x_dir *= -1
+        
+        for player in self.players:
+            rect = player.rect()
+            if ball_rect.colliderect(rect):
+                self.x_dir *= -1

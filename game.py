@@ -1,8 +1,9 @@
 import pygame
 import sys
+import random
 
 from scripts.utils import load_image
-from scripts.entities import PhysicsEntity
+from scripts.entities import PhysicsEntity, Ball
 
 class Game:
     def __init__(self):
@@ -24,8 +25,8 @@ class Game:
 
         # Entities
         self.player = PhysicsEntity(self, 'player', (750, (self.screen.get_height() - 120 + 47) // 2), (17, 120))
-        self.computer = PhysicsEntity(self, 'computer', (50, (self.screen.get_height() - 120 + 47) // 2), (17, 120))
-        self.ball = PhysicsEntity(self, 'ball', ((self.screen.get_width() - 30) // 2, (self.screen.get_height() - 30 + 47) // 2), (30, 30))
+        self.computer = PhysicsEntity(self, 'computer', (50 - 17//2, (self.screen.get_height() - 120 + 47) // 2), (17, 120))
+        self.ball = Ball(self, 'ball', ((self.screen.get_width() - 30) // 2, (self.screen.get_height() - 30 + 47) // 2), (30, 30), random.randint(0, 1) * 2 - 1, random.randint(0, 1) * 2 - 1, 5, [self.player, self.computer])
         self.movement = [False, False] # [Up, Down]
 
         # UI stuff
