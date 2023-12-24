@@ -9,8 +9,7 @@ class Game:
         pygame.init()
         pygame.display.set_caption("PyPong")
 
-        self.screen = pygame.display.set_mode((800, 450))
-        # self.display = pygame.Surface((401, 228))
+        self.screen = pygame.display.set_mode((800, 497))
 
         self.clock = pygame.time.Clock()
 
@@ -23,23 +22,37 @@ class Game:
             'scorebar': load_image('ScoreBar.png')
         }
 
-        self.player = PhysicsEntity(self, 'player', (750, 175), (17, 120))
-        self.computer = PhysicsEntity(self, 'computer', (50, 175), (17, 120))
+        # Entities
+        self.player = PhysicsEntity(self, 'player', (750, (self.screen.get_height() - 120 + 47) // 2), (17, 120))
+        self.computer = PhysicsEntity(self, 'computer', (50, (self.screen.get_height() - 120 + 47) // 2), (17, 120))
+        self.ball = PhysicsEntity(self, 'ball', ((self.screen.get_width() - 30) // 2, (self.screen.get_height() - 30 + 47) // 2), (30, 30))
         self.movement = [False, False] # [Up, Down]
+
+        # UI stuff
+        self.player_score = 0
+        self.computer_score = 0
+        self.timer = 120
 
     def run(self):
         while True:
             # self.screen.fill((0, 0, 0)) # Clear everything
-            self.screen.blit(self.assets['board'], (0, 0)) # Blits background
+            self.screen.blit(self.assets['board'], (0, 47))
+            self.screen.blit(self.assets['scorebar'], (0, 0))
+            self.screen.blit(pygame.transform.flip(self.assets['scorebar'], True, False), (459, 0))
 
+            # Player Code
             self.player.update(self.movement[1] - self.movement[0], 5)
             self.player.render(self.screen)
-    
+
+            # Computer Code
             self.computer.render(self.screen)
+
+            # Ball Code
+            self.ball.update()
+            self.ball.render(self.screen)
 
             # Input Checker
             for event in pygame.event.get():
-                # Quitting
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
