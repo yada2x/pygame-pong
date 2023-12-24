@@ -34,7 +34,7 @@ class Game:
 
             self.player.update(self.movement[1] - self.movement[0], 5)
             self.player.render(self.screen)
-
+    
             self.computer.render(self.screen)
 
             # Input Checker
