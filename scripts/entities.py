@@ -36,9 +36,9 @@ class Ball(PhysicsEntity):
 
     def update(self):
         # Wall Collisions
-        # Check new pos before updating?
         self.pos[0] += self.speed * self.x_dir
         self.pos[1] += self.speed * self.y_dir
+
         ball_rect = self.rect()
         if ball_rect.bottom > self.screen_height:
             self.pos[1] = self.screen_height - self.size[1]
@@ -59,17 +59,10 @@ class Ball(PhysicsEntity):
         for player in self.players:
             rect = player.rect()
             if ball_rect.colliderect(rect):
-                # if ball_rect.bottom >= rect.top and ball_rect.right > rect.left:
-                #     if self.y_dir > 0:
-                #         self.y_dir *= -1
-                #     self.pos[1] = rect.top - self.size[1]
-                #     print("TOP")
-
-                # elif ball_rect.top <= rect.bottom and ball_rect.right > rect.left:
-                #     if self.y_dir < 0:
-                #         self.y_dir *= -1
-                #     self.pos[1] = rect.bottom
-                #     print("BOT")
+                if self.x_dir > 0:
+                    self.pos[0] = rect.left - self.size[0]
+                else:
+                    self.pos[0] = rect.right
                 self.x_dir *= -1
                 self.y_dir = random.random() * self.y_dir
-                self.speed += 1
+                self.speed = min(self.speed + 1, 20)
