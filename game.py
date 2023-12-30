@@ -26,7 +26,7 @@ class Game:
         # Entities
         self.player = PhysicsEntity(self, 'player', (750, (self.screen.get_height() - 120 + 47) // 2), (17, 120))
         self.computer = PhysicsEntity(self, 'computer', (50 - 17//2, (self.screen.get_height() - 120 + 47) // 2), (17, 120))
-        self.ball = Ball(self, 'ball', ((self.screen.get_width() - 30) // 2, (self.screen.get_height() - 30 + 47) // 2), (30, 30), random.randint(0, 1) * 2 - 1, random.randint(0, 1) * 2 - 1, 5, [self.player, self.computer])
+        self.ball = Ball(self, 'ball', ((self.screen.get_width() - 30) // 2, (self.screen.get_height() - 30 + 47) // 2), (30, 30), random.random() * random.randint(0, 1) * 2 - 1, random.random() * random.randint(0, 1) * 2 - 1, 5, [self.player, self.computer])
         self.movement = [False, False] # [Up, Down]
 
         # UI stuff
