@@ -57,7 +57,7 @@ class Ball(PhysicsEntity):
             self.pos[0] = 0
             return 3
 
-        if ball_rect.right >= 800:
+        if ball_rect.right >= 805:
             self.pos[0] = self.screen_width - self.size[0]
             return 4
 
@@ -70,7 +70,7 @@ class Ball(PhysicsEntity):
                 else:
                     self.pos[0] = rect.right
                 self.x_dir *= -1
-                self.speed = min(self.speed + 1, 30)
+                self.speed = min(self.speed + 2, 30)
                 paddle = True
         
         if paddle:
