@@ -1,9 +1,11 @@
 import pygame
 import sys
 import random
+import math
 
 from scripts.utils import load_image, display_text
 from scripts.entities import PhysicsEntity, Ball
+from scripts.sparks import Spark
 
 class Game:
     def __init__(self):
@@ -17,7 +19,6 @@ class Game:
 
         self.assets = {
             'ball': load_image('Ball.png'),
-            'ballmotion': load_image('BallMotion.png'),
             'board': load_image('Board.png'),
             'computer': load_image('Computer.png'),
             'player': load_image('Player.png'),
@@ -41,9 +42,12 @@ class Game:
         self.comp_movement = [False, False] # [Up, Down] For Player
         self.paddle_speed = 10
 
-        # UI stuff
+        # UI 
         self.player_score = 0
         self.computer_score = 0
+
+        # Sparks / Particle Effects
+        self.sparks: list[Spark] = []
 
     def restart(self):
         self.sfx['start'].play()
@@ -63,6 +67,7 @@ class Game:
     def run(self):
         self.restart()
         while True:
+            # Rendering assets
             self.screen.fill((0, 0, 0)) # Clear everything
             self.screen.blit(self.assets['board'], (0, 300))
             self.screen.blit(self.assets['board'], (0, 47))
@@ -84,10 +89,13 @@ class Game:
             collision = self.ball.update()
             self.ball.render(self.screen)
             
+            # Collision code
             restart = False
 
             if collision == 1:
                 self.sfx['paddle'].play()
+                for _ in range(10):
+                    self.sparks.append(Spark(self.ball.pos, random.random() - 0.5 + math.pi, 2 + random.random(), self.ball.x_dir))
             elif collision == 2:
                 self.sfx['wall'].play()
             elif collision == 3:
@@ -101,6 +109,14 @@ class Game:
                 self.ball.render(self.screen)
                 restart = True
 
+            # Sparks / Particles Code
+            for spark in self.sparks.copy():
+                kill = spark.update()
+                spark.render(self.screen)
+                if kill:
+                    self.sparks.remove(spark)
+
+            # End-State Code
             if self.time_left <= 0:
                 restart = True
                 if self.player_score > self.computer_score: 
