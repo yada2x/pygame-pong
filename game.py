@@ -12,6 +12,8 @@ class Game:
 
         self.screen = pygame.display.set_mode((800, 657))
         self.clock = pygame.time.Clock()
+        pygame.time.set_timer(pygame.USEREVENT, 1000)
+        self.time_left = 30
 
         self.assets = {
             'ball': load_image('Ball.png'),
@@ -42,7 +44,6 @@ class Game:
         # UI stuff
         self.player_score = 0
         self.computer_score = 0
-        self.timer = 120
 
     def restart(self):
         self.sfx['start'].play()
@@ -50,32 +51,26 @@ class Game:
         self.computer = PhysicsEntity(self, 'computer', (50 - 17, (self.screen.get_height() - 120 + 47) // 2), (17, 120))
         self.ball = Ball(self, 'ball', ((self.screen.get_width() - 30) // 2, (self.screen.get_height() - 30 + 47) // 2), (30, 30), random.choice([-1, 1]), random.choice([-1, -0.5, 0.5, 1]), 5, [self.player, self.computer])
 
-    def gameover(self):
+    def gameover(self, result):
         font = pygame.font.SysFont("Comic Sans", 40)
-        if self.player_score >= 5:
+        if result == 1:
             display_text(self.screen, "PLAYER WINS", font, (255, 255, 255), self.screen.get_width()//2 - font.size("PLAYER WINS")[0]//2, self.screen.get_height()//2 - 57)
-        elif self.computer_score >= 5:
+        elif result == 2:
             display_text(self.screen, "COMPUTER WINS", font, (255, 255, 255), self.screen.get_width()//2 - font.size("COMPUTER WINS")[0]//2, self.screen.get_height()//2 - 57)
-        pygame.display.update()
-        pygame.time.delay(2000)
+        elif result == 3:
+            display_text(self.screen, "DRAW", font, (255, 255, 255), self.screen.get_width()//2 - font.size("DRAW")[0]//2, self.screen.get_height()//2 - 57)
 
     def run(self):
         self.restart()
         while True:
-            # self.screen.fill((0, 0, 0)) # Clear everything
+            self.screen.fill((0, 0, 0)) # Clear everything
             self.screen.blit(self.assets['board'], (0, 300))
             self.screen.blit(self.assets['board'], (0, 47))
             self.screen.blit(self.assets['scorebar'], (0, 0))
             self.screen.blit(pygame.transform.flip(self.assets['scorebar'], True, False), (459, 0))
             display_text(self.screen, str(self.computer_score), pygame.font.SysFont("Comic Sans", 40), (0, 0, 0), self.screen.get_width()//2 - 150, -5)
             display_text(self.screen, str(self.player_score), pygame.font.SysFont("Comic Sans", 40), (0, 0, 0), self.screen.get_width()//2 + 126, -5)
-
-            restart = False
-            if self.player_score >= 5 or self.computer_score >= 5:
-                self.gameover()
-                self.player_score = 0
-                self.computer_score = 0
-                self.restart()
+            display_text(self.screen, str(self.time_left), pygame.font.SysFont("Comic Sans", 40), (255, 255, 255), self.screen.get_width()//2 - (20 if self.time_left >= 10 else 10), -5)
 
             # Player Code
             self.player.update(self.movement[1] - self.movement[0], self.paddle_speed)
@@ -89,6 +84,8 @@ class Game:
             collision = self.ball.update()
             self.ball.render(self.screen)
             
+            restart = False
+
             if collision == 1:
                 self.sfx['paddle'].play()
             elif collision == 2:
@@ -104,14 +101,34 @@ class Game:
                 self.ball.render(self.screen)
                 restart = True
 
+            if self.time_left <= 0:
+                restart = True
+                if self.player_score > self.computer_score: 
+                    result = 1
+                elif self.player_score < self.computer_score:
+                    result = 2
+                else:
+                    result = 3
+                self.gameover(result)
+                self.player_score = 0
+                self.computer_score = 0
+                self.time_left = 30
+
             # Input Checker
             for event in pygame.event.get():
+                if event.type == pygame.USEREVENT:
+                    self.time_left -= 1
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
 
                 # Player Movement
                 if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        sys.exit()
+                    if event.key == pygame.K_r:
+                        self.restart()
                     if event.key == pygame.K_UP:
                         self.movement[0] = True
                     if event.key == pygame.K_DOWN:
@@ -136,7 +153,6 @@ class Game:
             if restart:
                 pygame.time.delay(1000)
                 self.restart()
-                
-
+                self.time_left += 1
 
 Game().run()
