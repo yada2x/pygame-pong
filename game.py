@@ -112,7 +112,7 @@ class Game:
             # Sparks / Particles Code
             for spark in self.sparks.copy():
                 kill = spark.update()
-                spark.render(self.screen)
+                spark.render(self.screen, self.ball.collisions)
                 if kill:
                     self.sparks.remove(spark)
 

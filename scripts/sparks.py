@@ -15,9 +15,9 @@ class Spark:
         self.speed = max(0, self.speed - 0.1)
         return not self.speed
 
-    def render(self, surface: pygame.Surface):
+    def render(self, surface: pygame.Surface, collisions):
         render_points = [
-            (self.pos[0] + math.cos(self.angle) * 10, self.pos[1] + math.sin(self.angle)),
+            (self.pos[0] + math.cos(self.angle) * 10, self.pos[1] + math.sin(self.angle)* 10),
             (self.pos[0] + math.cos(self.angle + math.pi) * 10, self.pos[1] + math.sin(self.angle + math.pi) * 10),
             (self.pos[0] + math.cos(self.angle + math.pi) * 10, self.pos[1] + math.sin(self.angle + math.pi) * 10),
             (self.pos[0] + math.cos(self.angle - math.pi) * 10, self.pos[1] + math.sin(self.angle - math.pi) * 10),
