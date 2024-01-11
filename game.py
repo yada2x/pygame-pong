@@ -3,8 +3,9 @@ import sys
 import random
 import math
 
-from scripts.utils import load_image, display_text
+from scripts.utils import load_image, load_images, display_text, Animation
 from scripts.entities import PhysicsEntity, Ball
+from scripts.particles import Particle
 
 class Game:
     def __init__(self):
@@ -14,14 +15,15 @@ class Game:
         self.screen = pygame.display.set_mode((800, 657))
         self.clock = pygame.time.Clock()
         pygame.time.set_timer(pygame.USEREVENT, 1000)
-        self.time_left = 30
+        self.time_left = 99
 
         self.assets = {
             'ball': load_image('Ball.png'),
             'board': load_image('Board.png'),
             'computer': load_image('Computer.png'),
             'player': load_image('Player.png'),
-            'scorebar': load_image('ScoreBar.png')
+            'scorebar': load_image('ScoreBar.png'),
+            'bump': Animation(load_images('/particles/bump'), 3, False)
         }
         
         self.sfx = {
@@ -39,11 +41,14 @@ class Game:
         # Movement
         self.movement = [False, False] # [Up, Down] For Player
         self.comp_movement = [False, False] # [Up, Down] For Player
-        self.paddle_speed = 10
+        self.paddle_speed = 15
 
         # UI 
         self.player_score = 0
         self.computer_score = 0
+
+        # Particles
+        self.particles = []
 
     def restart(self):
         self.sfx['start'].play()
@@ -90,8 +95,37 @@ class Game:
 
             if collision == 1:
                 self.sfx['paddle'].play()
+                
+                # Create particles for paddle hits
+                for _ in range(15):
+                    op = random.choice((-1, 1))
+                    ball_rect = self.ball.rect()
+                    if self.ball.x_dir >= 1:
+                        temp_rect = self.computer.rect()
+                        particle_pos = (temp_rect.right + 2, ball_rect.centery + op * random.random() * 6)
+                        velocity = [random.random() * 2, op * random.random() * 4]
+                    else:
+                        temp_rect = self.player.rect()
+                        particle_pos = (temp_rect.left - 2, ball_rect.centery + op * random.random() * 6)
+                        velocity = [random.random() * -2, op * random.random() * 4]
+                
+                    self.particles.append(Particle(self, "bump", particle_pos, velocity, random.randint(0, 3)))
+
             elif collision == 2:
                 self.sfx['wall'].play()
+
+                # Create particles for wall hits
+                for _ in range(15):
+                    op = random.choice((-1, 1))
+                    temp_rect = self.ball.rect()
+                    if self.ball.y_dir < 0:
+                        particle_pos = (temp_rect.centerx + op * random.random() * 8, self.screen.get_height() - 3)
+                        velocity = [op * random.random() * 4, random.random() * -2]
+                    else:
+                        particle_pos = (temp_rect.centerx + op * random.random() * 8, 50)
+                        velocity = [op * random.random() * 4, random.random() * 2]
+                    self.particles.append(Particle(self, "bump", particle_pos, velocity, random.randint(0, 3)))
+
             elif collision == 3:
                 self.player_score += 1
                 self.sfx['score'].play()
@@ -116,6 +150,17 @@ class Game:
                 self.player_score = 0
                 self.computer_score = 0
                 self.time_left = 30
+
+            # Particle management
+            particle: Particle
+            for particle in self.particles.copy():
+                kill = particle.update()
+                particle.render(self.screen)
+                
+                # particle.pos[0] += math.sin(particle.animation.frame * 0.035) * 0.3
+                
+                if kill:
+                    self.particles.remove(particle)
 
             # Input Checker
             for event in pygame.event.get():

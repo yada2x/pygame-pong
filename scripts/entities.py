@@ -78,7 +78,7 @@ class Ball(PhysicsEntity):
                     self.pos[0] = rect.right
                     self.collisions["left"] = True
                 self.x_dir *= -1
-                self.speed = min(self.speed + 2, 30)
+                self.speed = min(self.speed + 1, 30)
                 paddle = True
         
         if paddle:
