@@ -5,7 +5,6 @@ import math
 
 from scripts.utils import load_image, display_text
 from scripts.entities import PhysicsEntity, Ball
-from scripts.sparks import Spark
 
 class Game:
     def __init__(self):
@@ -45,9 +44,6 @@ class Game:
         # UI 
         self.player_score = 0
         self.computer_score = 0
-
-        # Sparks / Particle Effects
-        self.sparks: list[Spark] = []
 
     def restart(self):
         self.sfx['start'].play()
@@ -94,8 +90,6 @@ class Game:
 
             if collision == 1:
                 self.sfx['paddle'].play()
-                for _ in range(10):
-                    self.sparks.append(Spark(self.ball.pos, random.random() - 0.5 + math.pi, 2 + random.random(), self.ball.x_dir))
             elif collision == 2:
                 self.sfx['wall'].play()
             elif collision == 3:
@@ -108,13 +102,6 @@ class Game:
                 self.sfx['score'].play()
                 self.ball.render(self.screen)
                 restart = True
-
-            # Sparks / Particles Code
-            for spark in self.sparks.copy():
-                kill = spark.update()
-                spark.render(self.screen)
-                if kill:
-                    self.sparks.remove(spark)
 
             # End-State Code
             if self.time_left <= 0:
