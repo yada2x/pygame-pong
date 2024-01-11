@@ -8,7 +8,7 @@ class PhysicsEntity:
         self.type = type
         self.pos = list(pos)
         self.size = size
-        self.collisions = {'up': False, 'down': False, 'right': False, 'left': False}
+        self.collisions = {'up': False, 'down': False, 'right': False, 'left': False, 'goal': False}
     
     def rect(self):
         return pygame.Rect(self.pos[0], self.pos[1], self.size[0], self.size[1])
@@ -35,6 +35,8 @@ class Ball(PhysicsEntity):
         self.players = players
 
     def update(self):
+        self.collisions = {'up': False, 'down': False, 'right': False, 'left': False, 'goal': False}
+
         # Wall Collisions
         wall = False
         paddle = False
@@ -47,18 +49,22 @@ class Ball(PhysicsEntity):
             self.pos[1] = self.screen_height - self.size[1]
             self.y_dir *= -1
             wall = True
+            self.collisions["down"] = True
         if ball_rect.top <= 47:
             self.pos[1] = 47
             self.y_dir *= -1
             wall = True
+            self.collisions["up"] = True
 
         # Goal collisions
         if ball_rect.left < 0:
             self.pos[0] = 0
+            self.collisions["goal"] = True
             return 3
 
         if ball_rect.right >= 805:
             self.pos[0] = self.screen_width - self.size[0]
+            self.collisions["goal"] = True
             return 4
 
         # Player collisions
@@ -67,8 +73,10 @@ class Ball(PhysicsEntity):
             if ball_rect.colliderect(rect):
                 if self.x_dir > 0:
                     self.pos[0] = rect.left - self.size[0]
+                    self.collisions["right"] = True
                 else:
                     self.pos[0] = rect.right
+                    self.collisions["left"] = True
                 self.x_dir *= -1
                 self.speed = min(self.speed + 2, 30)
                 paddle = True

@@ -103,6 +103,13 @@ class Game:
                 self.ball.render(self.screen)
                 restart = True
 
+            # Sparks / Particles Code
+            for spark in self.sparks.copy():
+                kill = spark.update()
+                spark.render(self.screen)
+                if kill:
+                    self.sparks.remove(spark)
+
             # End-State Code
             if self.time_left <= 0:
                 restart = True
