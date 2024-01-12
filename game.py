@@ -97,7 +97,8 @@ class Game:
                 self.sfx['paddle'].play()
                 
                 # Create particles for paddle hits
-                for _ in range(15):
+                speed = self.ball.speed
+                for _ in range(5, speed):
                     op = random.choice((-1, 1))
                     ball_rect = self.ball.rect()
                     if self.ball.x_dir >= 1:
@@ -113,9 +114,9 @@ class Game:
 
             elif collision == 2:
                 self.sfx['wall'].play()
-
+                speed = self.ball.speed
                 # Create particles for wall hits
-                for _ in range(15):
+                for _ in range(5, speed):
                     op = random.choice((-1, 1))
                     temp_rect = self.ball.rect()
                     if self.ball.y_dir < 0:
@@ -149,7 +150,7 @@ class Game:
                 self.gameover(result)
                 self.player_score = 0
                 self.computer_score = 0
-                self.time_left = 30
+                self.time_left = 99
 
             # Particle management
             particle: Particle
